@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.insurance.insurance_backend.mapper.InsurancePlanMapper">
+
+    <sql id="columns">
+        id, name, category, description, base_premium, max_coverage,
+        min_age, max_age, status, sort_order, created_at, updated_at
+    </sql>
+
+    <select id="findAll" resultType="com.insurance.insurance_backend.entity.InsurancePlan">
+        SELECT <include refid="columns"/>
+        FROM insurance_plans
+        <where>
+            <if test="category != null and category != ''">
+                category = #{category}
+            </if>
+        </where>
+        ORDER BY sort_order ASC, id DESC
+    </select>
+
+    <select id="findById" resultType="com.insurance.insurance_backend.entity.InsurancePlan">
+        SELECT <include refid="columns"/>
+        FROM insurance_plans
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO insurance_plans
+            (name, category, description, base_premium, max_coverage,
+             min_age, max_age, status, sort_order)
+        VALUES
+            (#{name}, #{category}, #{description}, #{basePremium}, #{maxCoverage},
+             #{minAge}, #{maxAge}, #{status}, #{sortOrder})
+    </insert>
+
+    <update id="update">
+        UPDATE insurance_plans
+        SET name         = #{name},
+            category     = #{category},
+            description  = #{description},
+            base_premium = #{basePremium},
+            max_coverage = #{maxCoverage},
+            min_age      = #{minAge},
+            max_age      = #{maxAge},
+            status       = #{status},
+            sort_order   = #{sortOrder}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM insurance_plans WHERE id = #{id}
+    </delete>
+
+</mapper>

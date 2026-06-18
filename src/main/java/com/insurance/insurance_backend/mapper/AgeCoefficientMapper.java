@@ -17,7 +17,7 @@ public interface AgeCoefficientMapper {
                 description
             FROM age_coefficients
             WHERE #{age} BETWEEN min_age AND max_age
-            LIMIT 1
+            LIMIT 1 
             """)
     AgeCoefficient findByAge(Integer age);
 }

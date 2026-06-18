@@ -17,6 +17,7 @@ public interface OccupationRiskCoefficientMapper {
                 description
             FROM occupation_risk_coefficients
             WHERE risk_level = #{riskLevel}
+            ORDER BY risk_coefficient DESC
             LIMIT 1
             """)
     OccupationRiskCoefficient findByRiskLevel(String riskLevel);

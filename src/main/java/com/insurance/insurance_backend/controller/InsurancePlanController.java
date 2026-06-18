@@ -5,6 +5,7 @@ import com.insurance.insurance_backend.entity.InsurancePlan;
 import com.insurance.insurance_backend.service.InsurancePlanService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +25,9 @@ import java.util.List;
  * 成功直接回傳資料物件，錯誤由 GlobalExceptionHandler 統一包成 ErrorResponse。
  * TODO 製作後端的JWT驗證
  */
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/v1/plans")
+@RequestMapping("/api/v1")
 public class InsurancePlanController {
 
     private final InsurancePlanService planService;
@@ -35,7 +37,7 @@ public class InsurancePlanController {
     }
 
     /** 取得保單列表，category 選填。 */
-    @GetMapping
+    @GetMapping("/plans")
     public List<InsurancePlan> list(@RequestParam(required = false) String category) {
         return planService.findAll(category);
     }

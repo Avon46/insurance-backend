@@ -19,14 +19,14 @@ public class PremiumCalculationController {
     private final InsurancePlanMapper insurancePlanMapper;
 
     public PremiumCalculationController(PremiumCalculationService premiumCalculationService,
-                                        InsurancePlanMapper insurancePlanMapper) {
+            InsurancePlanMapper insurancePlanMapper) {
         this.premiumCalculationService = premiumCalculationService;
         this.insurancePlanMapper = insurancePlanMapper;
     }
 
     @GetMapping("/plans")
     public ResponseEntity<List<InsurancePlan>> getPlans() {
-        List<InsurancePlan> plans = insurancePlanMapper.findAllActive();
+        List<InsurancePlan> plans = insurancePlanMapper.findAll(null);
         return ResponseEntity.ok(plans);
     }
 

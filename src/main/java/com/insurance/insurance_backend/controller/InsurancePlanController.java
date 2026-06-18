@@ -25,7 +25,7 @@ import java.util.List;
  * TODO 製作後端的JWT驗證
  */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/plans")
 public class InsurancePlanController {
 
     private final InsurancePlanService planService;
@@ -35,7 +35,7 @@ public class InsurancePlanController {
     }
 
     /** 取得保單列表，category 選填。 */
-    @GetMapping("/plans")
+    @GetMapping
     public List<InsurancePlan> list(@RequestParam(required = false) String category) {
         return planService.findAll(category);
     }

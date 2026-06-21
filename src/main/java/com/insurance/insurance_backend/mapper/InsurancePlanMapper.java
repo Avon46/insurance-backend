@@ -26,4 +26,12 @@ public interface InsurancePlanMapper {
     int update(InsurancePlan plan);
 
     int deleteById(@Param("id") Integer id);
+
+    List<InsurancePlan> findEligiblePlans(
+        @Param("budgetLimit") int budgetLimit,
+        @Param("age") int age,
+        @Param("categories") List<String> categories);// 查詢推薦保險方案
+
+    List<String> findTagsByPlanId(Integer planId);// 查詢保險方案tags
+
 }

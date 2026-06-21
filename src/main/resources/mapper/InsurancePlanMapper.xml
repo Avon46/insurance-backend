@@ -52,4 +52,23 @@
         DELETE FROM insurance_plans WHERE id = #{id}
     </delete>
 
+    <select id="findEligiblePlans" resultType="com.insurance.insurance_backend.entity.InsurancePlan">
+        SELECT <include refid="columns"/>
+        FROM insurance_plans
+        WHERE base_premium &lt;= #{budgetLimit}
+        AND min_age &lt;= #{age}
+        AND max_age &gt;= #{age}
+        AND category IN
+        <foreach item="item" collection="categories" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findTagsByPlanId" resultType="string">
+        SELECT t.tag
+        FROM insurance_plan_tags pt
+        JOIN insurance_tags t ON pt.insurance_tags_id = t.id
+        WHERE pt.insurance_plan_id = #{planId}
+    </select>
+
 </mapper>

@@ -1,0 +1,30 @@
+package com.insurance.insurance_backend.controller;
+
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.insurance.insurance_backend.dto.RecommendReqDTO;
+import com.insurance.insurance_backend.dto.RecommendRespDTO;
+import com.insurance.insurance_backend.service.RecommendService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1")
+public class RecommendController {
+    private final RecommendService recommendService;
+
+    @PostMapping("recommend")
+    @Operation(summary = "智慧推薦保單")
+    public ResponseEntity<List<RecommendRespDTO>> recommend(@RequestBody RecommendReqDTO req) {
+        return ResponseEntity.ok(recommendService.recommend(req));
+    }
+}

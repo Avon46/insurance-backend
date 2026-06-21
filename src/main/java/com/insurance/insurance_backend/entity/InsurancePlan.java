@@ -31,4 +31,5 @@ public class InsurancePlan {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+    private String coveragePeriod;//保障年期
 }

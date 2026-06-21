@@ -64,4 +64,9 @@ public class InsurancePlanController {
     public void delete(@PathVariable Integer id) {
         planService.delete(id);
     }
+
+    @GetMapping("/findtags/{id}")
+    public List<String> getTags(@PathVariable Integer id) {
+        return planService.getTags(id);
+    }
 }

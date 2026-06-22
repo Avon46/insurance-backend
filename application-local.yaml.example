@@ -1,0 +1,10 @@
+# 範本檔（會提交）。請複製為 application-local.yaml 後填入自己的 MySQL 設定。
+# Windows PowerShell:  Copy-Item application-local.yaml.example application-local.yaml
+#
+# application-local.yaml 已被 .gitignore 排除，不會上傳，可安心放密碼。
+spring:
+  datasource:
+    # 預設連 localhost:3306/insured，需要時可整段覆寫 url
+    # url: jdbc:mysql://localhost:3306/insured?serverTimezone=Asia/Taipei&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 你的MySQL密碼

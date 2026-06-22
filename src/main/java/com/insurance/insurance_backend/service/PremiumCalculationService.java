@@ -1,5 +1,6 @@
 package com.insurance.insurance_backend.service;
 
+import com.insurance.insurance_backend.converter.PremiumCalculationConverter;
 import com.insurance.insurance_backend.dto.PremiumCalculationRequest;
 import com.insurance.insurance_backend.dto.PremiumCalculationResponse;
 import com.insurance.insurance_backend.entity.AgeCoefficient;
@@ -10,26 +11,22 @@ import com.insurance.insurance_backend.exception.ResourceNotFoundException;
 import com.insurance.insurance_backend.mapper.AgeCoefficientMapper;
 import com.insurance.insurance_backend.mapper.InsurancePlanMapper;
 import com.insurance.insurance_backend.mapper.OccupationRiskCoefficientMapper;
+
+import lombok.AllArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Service
+@AllArgsConstructor
 public class PremiumCalculationService {
 
     private final InsurancePlanMapper insurancePlanMapper;
     private final AgeCoefficientMapper ageCoefficientMapper;
     private final OccupationRiskCoefficientMapper occupationRiskCoefficientMapper;
-
-    public PremiumCalculationService(
-            InsurancePlanMapper insurancePlanMapper,
-            AgeCoefficientMapper ageCoefficientMapper,
-            OccupationRiskCoefficientMapper occupationRiskCoefficientMapper) {
-        this.insurancePlanMapper = insurancePlanMapper;
-        this.ageCoefficientMapper = ageCoefficientMapper;
-        this.occupationRiskCoefficientMapper = occupationRiskCoefficientMapper;
-    }
+    private final PremiumCalculationConverter premiumCalculationConverter;
 
     public PremiumCalculationResponse calculate(PremiumCalculationRequest request) {
 
@@ -105,16 +102,11 @@ public class PremiumCalculationService {
         }
 
         // 9. 組 Response
-        PremiumCalculationResponse response = new PremiumCalculationResponse();
-        response.setPlanId(plan.getId());
-        response.setPlanName(plan.getName());
-        response.setBasePremium(plan.getBasePremium());
-        response.setAge(request.getAge());
-        response.setAgeCoefficient(ageCoefficient.getAgeCoefficient());
-        response.setRiskLevel(riskCoefficient.getRiskLevel());
-        response.setRiskCoefficient(riskCoefficient.getRiskCoefficient());
-        response.setEstimatedPremium(estimatedPremium);
-
-        return response;
+        return premiumCalculationConverter.toResponse(
+                plan,
+                request,
+                ageCoefficient,
+                riskCoefficient,
+                estimatedPremium);
     }
 }

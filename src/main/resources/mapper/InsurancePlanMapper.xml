@@ -5,7 +5,7 @@
 
     <sql id="columns">
         id, name, category, description, base_premium, max_coverage,
-        min_age, max_age, status, sort_order, created_at, updated_at
+        min_age, max_age, status, sort_order, created_at, updated_at,coverage_period
     </sql>
 
     <select id="findAll" resultType="com.insurance.insurance_backend.entity.InsurancePlan">
@@ -71,4 +71,32 @@
         WHERE pt.insurance_plan_id = #{planId}
     </select>
 
+    <select id="selectCandidates" resultType="com.insurance.insurance_backend.entity.InsurancePlan">
+        SELECT
+            id, name, category, description, base_premium, max_coverage,
+            min_age, max_age, status, sort_order, created_at, updated_at, coverage_period
+        FROM insurance_plans
+        WHERE status = 'ACTIVE'
+
+        <if test="cond.age != null">
+            AND #{cond.age} BETWEEN min_age AND max_age
+        </if>
+
+        <if test="cond.budgetLimit != null">
+            AND base_premium &lt;= #{cond.budgetLimit}
+        </if>
+
+        <if test="cond.categories != null and cond.categories.size() > 0">
+            AND category IN
+            <foreach collection="cond.categories" item="c" open="(" separator="," close=")">
+                #{c}
+            </foreach>
+        </if>
+
+        <if test="cond.schedule != null and cond.schedule != ''">
+            AND coverage_period = #{cond.schedule}
+        </if>
+
+        ORDER BY sort_order ASC
+    </select>
 </mapper>

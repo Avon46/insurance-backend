@@ -29,7 +29,7 @@ public class UserGroupRuleFactory {
         young.setDefaultNeed("MEDICAL");
 
         UserGroupRule family = new UserGroupRule();
-        family.setGroupName("FAMILY");
+        family.setGroupName("MIDDLE_AGED");
         family.setMinAge(30);
         family.setMaxAge(50);
         family.setRecommendBudgetMin(15000);

@@ -1,5 +1,6 @@
 package com.insurance.insurance_backend.mapper;
 
+import com.insurance.insurance_backend.dto.PlanQueryCondition;
 import com.insurance.insurance_backend.entity.InsurancePlan;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -34,4 +35,12 @@ public interface InsurancePlanMapper {
 
     List<String> findTagsByPlanId(Integer planId);// 查詢保險方案tags
 
+    /**
+     * 依條件粗篩候選保單：
+     * - status = ACTIVE
+     * - age 落在 [minAge, maxAge]
+     * - category 命中 categories 其中之一
+     * - basePremium <= budgetLimit
+     */
+    List<InsurancePlan> selectCandidates(@Param("cond") PlanQueryCondition cond);
 }

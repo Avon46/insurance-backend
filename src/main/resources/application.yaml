@@ -4,17 +4,21 @@ server:
 spring:
   application:
     name: insurance-backend
-  jackson:
-    property-naming-strategy: SNAKE_CASE
 
   # 各機器不同的 DB 連線值放在 application-local.yaml（已 gitignore），
   # 若該檔存在會覆寫以下預設值。沒有也能用環境變數或預設值啟動。
   config:
     import: optional:file:./application-local.yaml
   datasource:
+<<<<<<< HEAD
     url: jdbc:mysql://localhost:3306/${DB_NAME:insured}?serverTimezone=Asia/Taipei&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:}
+=======
+    url: jdbc:mysql://localhost:3306/insured?serverTimezone=Asia/Taipei&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+>>>>>>> 7d819770c577d7cd0f8cde3d6fbafc9c0c2fe7ab
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:

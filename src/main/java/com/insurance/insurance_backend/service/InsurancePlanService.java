@@ -83,4 +83,8 @@ public class InsurancePlanService {
             throw new BusinessException("最低承保年齡不可大於最高承保年齡", "INVALID_AGE_RANGE");
         }
     }
+
+    public List<String> getTags(Integer id) {
+        return planMapper.findTagsByPlanId(id);
+    }
 }

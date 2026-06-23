@@ -7,91 +7,116 @@ import com.insurance.insurance_backend.entity.InsurancePlan;
 
 @Component
 public class ScoreCalculator {
-    private static final int AGE_SCORE_MAX = 40;
-    private static final int BUDGET_SCORE_MAX = 40;
-    private static final int SCHEDULE_SCORE_MAX = 20;
-    private static final int SCHEDULE_SCORE_BASE = 10; // 不匹配時的基礎分
- 
+
+    /** 年齡分滿分（50） */
+    private static final int AGE_SCORE_MAX = 50;
+
+    /** 預算分滿分（50） */
+    private static final int BUDGET_SCORE_MAX = 50;
+
     /**
-     * 年齡分：年齡落在 [minAge, maxAge] 內，越接近區間中點分數越高。
-     * 落在區間外（理論上 DB 已過濾掉，這裡做防禦性處理）給予低分而非直接 0，
-     * 避免極端情況下候選池為空。
+     * 年齡分：
+     * - 在區間內：依距離中點遠近給分
+     * - 超出區間：0分
      */
     public int calcAgeScore(Integer age, InsurancePlan plan) {
+
         if (age == null || plan.getMinAge() == null || plan.getMaxAge() == null) {
-            return AGE_SCORE_MAX / 2;
+            return AGE_SCORE_MAX / 2; // 防禦性：25分
         }
+
         int min = plan.getMinAge();
         int max = plan.getMaxAge();
+
+        // 超出年齡範圍
         if (age < min || age > max) {
             return 0;
         }
+
+        // 無區間（例如 min=max）
         if (max == min) {
             return AGE_SCORE_MAX;
         }
+
+        // 區間中點
         double mid = (min + max) / 2.0;
+
+        // 半區間
         double halfRange = (max - min) / 2.0;
-        double distanceRatio = Math.abs(age - mid) / halfRange; // 0(中心) ~ 1(邊界)
-        double score = AGE_SCORE_MAX * (1 - distanceRatio * 0.3); // 邊界最多扣 30%
+
+        // 距離中心比例（0 = 中心，1 = 邊界）
+        double distanceRatio = Math.abs(age - mid) / halfRange;
+
+        // 邊界最多扣 30%
+        double score = AGE_SCORE_MAX * (1 - distanceRatio * 0.3);
+
         return (int) Math.round(score);
     }
- 
+
     /**
-     * 預算分：basePremium 越接近 budgetLimit（且不超過）分數越高，代表「預算利用率」。
-     * 注意：超過預算的方案應在 DB 層或 Service 層先被排除，這裡假設輸入已合法。
+     * 預算分：
+     * - 保費 <= 預算：依使用比例給分（越貼近上限越高）
+     * - 超出預算：0分
      */
     public int calcBudgetScore(Integer budgetLimit, InsurancePlan plan) {
-        if (budgetLimit == null || budgetLimit <= 0 || plan.getBasePremium() == null) {
-            return BUDGET_SCORE_MAX / 2;
+
+        if (budgetLimit == null
+                || budgetLimit <= 0
+                || plan.getBasePremium() == null) {
+            return BUDGET_SCORE_MAX / 2; // 防禦性：25分
         }
-        if (plan.getBasePremium() > budgetLimit) {
+
+        int premium = plan.getBasePremium();
+
+        // 超出預算直接淘汰
+        if (premium > budgetLimit) {
             return 0;
         }
-        double ratio = (double) plan.getBasePremium() / budgetLimit; // 0~1
+
+        double ratio = (double) premium / budgetLimit;
+
         return (int) Math.round(BUDGET_SCORE_MAX * ratio);
     }
- 
+
     /**
-     * 保障期間分：與用戶期望的 schedule 完全相符給滿分，否則給基礎分（仍可入選，只是分數較低）。
+     * 總分（100分制）
      */
-    public int calcScheduleScore(String schedule, InsurancePlan plan) {
-        if (schedule == null || schedule.isBlank() || plan.getCoveragePeriod() == null) {
-            return SCHEDULE_SCORE_BASE;
-        }
-        if (schedule.trim().equals(plan.getCoveragePeriod().trim())) {
-            return SCHEDULE_SCORE_MAX;
-        }
-        return SCHEDULE_SCORE_BASE;
+    public int calcTotalScore(int ageScore, int budgetScore) {
+        return ageScore + budgetScore;
     }
- 
+
     /**
-     * 組合三個分數為總分。
+     * 推薦理由（只基於年齡 + 預算）
      */
-    public int calcTotalScore(int ageScore, int budgetScore, int scheduleScore) {
-        return ageScore + budgetScore + scheduleScore;
-    }
- 
-    /**
-     * 依分數明細產生推薦理由文案。
-     */
-    public String buildReason(RecommendReqDTO req, InsurancePlan plan, int ageScore, int budgetScore, int scheduleScore) {
+    public String buildReason(
+            RecommendReqDTO req,
+            InsurancePlan plan,
+            int ageScore,
+            int budgetScore) {
+
         StringBuilder sb = new StringBuilder();
-        sb.append(plan.getName()).append(" 適合您，因為：");
+
+        sb.append(plan.getName())
+          .append(" 適合您，因為：");
+
+        // 年齡理由
         if (ageScore >= AGE_SCORE_MAX * 0.8) {
             sb.append("年齡與保障對象高度吻合；");
         } else if (ageScore > 0) {
             sb.append("符合年齡投保範圍；");
-        }
-        if (budgetScore >= BUDGET_SCORE_MAX * 0.8) {
-            sb.append("保費貼近您設定的預算上限；");
-        } else if (budgetScore > 0) {
-            sb.append("保費在您可負擔範圍內；");
-        }
-        if (scheduleScore == SCHEDULE_SCORE_MAX) {
-            sb.append("保障期間符合您的規劃。");
         } else {
-            sb.append("提供 ").append(plan.getCoveragePeriod()).append(" 的保障規劃。");
+            sb.append("年齡略超出建議範圍；");
         }
+
+        // 預算理由
+        if (budgetScore >= BUDGET_SCORE_MAX * 0.8) {
+            sb.append("保費非常貼近您的預算上限；");
+        } else if (budgetScore > 0) {
+            sb.append("保費在可接受範圍內；");
+        } else {
+            sb.append("保費超出預算範圍；");
+        }
+
         return sb.toString();
     }
 }

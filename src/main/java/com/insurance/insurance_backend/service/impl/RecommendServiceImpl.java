@@ -33,17 +33,16 @@ public class RecommendServiceImpl implements RecommendService {
         log.info("===== 開始執行保單推薦 =====");
         log.info("收到推薦請求: {}", req);
 
-        // 1. 建立查詢條件
+        // 1. 查詢條件
         PlanQueryCondition cond = PlanQueryCondition.builder()
                 .age(req.getAge())
                 .budgetLimit(req.getBudgetLimit())
                 .categories(req.getPrimaryNeeds())
-                .schedule(req.getSchedule())
                 .build();
 
         log.info("查詢條件: {}", cond);
 
-        // 2. 查詢符合條件的保單
+        // 2. 查詢候選保單
         List<InsurancePlan> candidates = insurancePlanMapper.selectCandidates(cond);
 
         log.info("查詢到 {} 筆候選保單", candidates.size());
@@ -53,7 +52,6 @@ public class RecommendServiceImpl implements RecommendService {
             return List.of();
         }
 
-        // 顯示候選保單
         candidates.forEach(plan ->
                 log.info("候選保單 => id={}, name={}, category={}, premium={}",
                         plan.getId(),
@@ -61,14 +59,14 @@ public class RecommendServiceImpl implements RecommendService {
                         plan.getCategory(),
                         plan.getBasePremium()));
 
-        // 3. 計算分數
+        // 3. 計算分數（只剩兩項）
         List<RecommendRespDTO> result = candidates.stream()
                 .map(plan -> buildScoredResp(req, plan))
                 .sorted(Comparator.comparingInt(RecommendRespDTO::getScore).reversed())
                 .limit(TOP_N)
                 .collect(Collectors.toList());
 
-        // 4. 設定排名
+        // 4. 排名
         for (int i = 0; i < result.size(); i++) {
             result.get(i).setRank(i + 1);
         }
@@ -76,8 +74,7 @@ public class RecommendServiceImpl implements RecommendService {
         log.info("===== 推薦結果 =====");
 
         result.forEach(r ->
-                log.info(
-                        "Rank={}, Plan={}, Score={}, AgeScore={}, BudgetScore={}",
+                log.info("Rank={}, Plan={}, Score={}, AgeScore={}, BudgetScore={}",
                         r.getRank(),
                         r.getName(),
                         r.getScore(),
@@ -91,29 +88,28 @@ public class RecommendServiceImpl implements RecommendService {
 
     private RecommendRespDTO buildScoredResp(RecommendReqDTO req, InsurancePlan plan) {
 
+        // ✅ 只剩兩個分數
         int ageScore = scoreCalculator.calcAgeScore(req.getAge(), plan);
         int budgetScore = scoreCalculator.calcBudgetScore(req.getBudgetLimit(), plan);
-        int scheduleScore = scoreCalculator.calcScheduleScore(req.getSchedule(), plan);
 
         int totalScore = scoreCalculator.calcTotalScore(
                 ageScore,
-                budgetScore,
-                scheduleScore);
+                budgetScore
+        );
 
         String reason = scoreCalculator.buildReason(
                 req,
                 plan,
                 ageScore,
-                budgetScore,
-                scheduleScore);
+                budgetScore
+        );
 
         log.info(
-                "保單評分 => id={}, name={}, ageScore={}, budgetScore={}, scheduleScore={}, totalScore={}",
+                "保單評分 => id={}, name={}, ageScore={}, budgetScore={}, totalScore={}",
                 plan.getId(),
                 plan.getName(),
                 ageScore,
                 budgetScore,
-                scheduleScore,
                 totalScore);
 
         RecommendRespDTO dto = new RecommendRespDTO();
@@ -125,9 +121,11 @@ public class RecommendServiceImpl implements RecommendService {
         dto.setHighlight(buildHighlight(plan));
         dto.setBasePremium(plan.getBasePremium());
         dto.setTags(buildTags(plan));
+
         dto.setScore(totalScore);
         dto.setBudgetScore(budgetScore);
         dto.setAgeScore(ageScore);
+
         dto.setReason(reason);
 
         return dto;
@@ -142,24 +140,15 @@ public class RecommendServiceImpl implements RecommendService {
             return List.of();
         }
 
-        List<String> highlights = List.of(
-                plan.getDescription().split("[,，;；]"));
-
-        log.debug("保單 {} Highlight: {}", plan.getId(), highlights);
-
-        return highlights;
+        return List.of(plan.getDescription().split("[,，;；]"));
     }
 
     /**
-     * tags 目前由 category + coveragePeriod 組成
+     * tags 由 DB 查詢
      */
     private List<String> buildTags(InsurancePlan plan) {
 
         List<String> tags = insurancePlanMapper.findTagsByPlanId(plan.getId());
-
-        // List<String> tags = List.of(
-        //         plan.getCategory(),
-        //         plan.getCoveragePeriod());
 
         log.debug("保單 {} Tags: {}", plan.getId(), tags);
 

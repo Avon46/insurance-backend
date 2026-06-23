@@ -12,7 +12,6 @@ import com.insurance.insurance_backend.dto.RecommendReqDTO;
 import com.insurance.insurance_backend.dto.RecommendRespDTO;
 import com.insurance.insurance_backend.service.RecommendService;
 
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -30,8 +29,8 @@ public class RecommendController {
     // }
 
     @PostMapping("/recommend")
-    public List<RecommendRespDTO> recommend(@Valid @RequestBody RecommendReqDTO req) {
-        return recommendService.recommend(req);
+    public ResponseEntity<List<RecommendRespDTO>> recommend(@Valid @RequestBody RecommendReqDTO req) {
+        return ResponseEntity.ok(recommendService.recommend(req));
     }
 
     @PostMapping("/debug")

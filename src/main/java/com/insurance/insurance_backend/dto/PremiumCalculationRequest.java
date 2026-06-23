@@ -9,7 +9,5 @@ public class PremiumCalculationRequest {
 
     private Integer age;
 
-    private String gender;
-
     private String riskLevel;
 }

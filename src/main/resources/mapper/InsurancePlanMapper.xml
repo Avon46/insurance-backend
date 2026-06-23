@@ -5,7 +5,7 @@
 
     <sql id="columns">
         id, name, category, description, base_premium, max_coverage,
-        min_age, max_age, status, sort_order, created_at, updated_at,coverage_period
+        min_age, max_age, status, created_at, updated_at,coverage_period
     </sql>
 
     <select id="findAll" resultType="com.insurance.insurance_backend.entity.InsurancePlan">
@@ -16,7 +16,7 @@
                 category = #{category}
             </if>
         </where>
-        ORDER BY sort_order ASC, id DESC
+        ORDER BY id DESC
     </select>
 
     <select id="findById" resultType="com.insurance.insurance_backend.entity.InsurancePlan">
@@ -28,10 +28,10 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO insurance_plans
             (name, category, description, base_premium, max_coverage,
-             min_age, max_age, status, sort_order)
+             min_age, max_age, status)
         VALUES
             (#{name}, #{category}, #{description}, #{basePremium}, #{maxCoverage},
-             #{minAge}, #{maxAge}, #{status}, #{sortOrder})
+             #{minAge}, #{maxAge}, #{status})
     </insert>
 
     <update id="update">
@@ -43,8 +43,7 @@
             max_coverage = #{maxCoverage},
             min_age      = #{minAge},
             max_age      = #{maxAge},
-            status       = #{status},
-            sort_order   = #{sortOrder}
+            status       = #{status}
         WHERE id = #{id}
     </update>
 
@@ -74,7 +73,7 @@
     <select id="selectCandidates" resultType="com.insurance.insurance_backend.entity.InsurancePlan">
         SELECT
             id, name, category, description, base_premium, max_coverage,
-            min_age, max_age, status, sort_order, created_at, updated_at, coverage_period
+            min_age, max_age, status, created_at, updated_at, coverage_period
         FROM insurance_plans
         WHERE status = 'ACTIVE'
 
@@ -97,6 +96,6 @@
             AND coverage_period = #{cond.schedule}
         </if>
 
-        ORDER BY sort_order ASC
+        ORDER BY id ASC
     </select>
 </mapper>

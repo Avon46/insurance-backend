@@ -15,7 +15,7 @@ public interface InsurancePlanMapper {
 
     /**
      * 取得保單列表。category 為 null 時回傳全部。
-     * 預設排序：sort_order ASC、id DESC。
+     * 預設排序：id DESC（依 serial 流水號）。
      */
     List<InsurancePlan> findAll(@Param("category") String category);
 

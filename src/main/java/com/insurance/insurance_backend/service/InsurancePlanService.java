@@ -72,7 +72,6 @@ public class InsurancePlanService {
         target.setMinAge(req.getMinAge() != null ? req.getMinAge() : 0);
         target.setMaxAge(req.getMaxAge() != null ? req.getMaxAge() : 80);
         target.setStatus(req.getStatus() != null ? req.getStatus() : "ACTIVE");
-        target.setSortOrder(req.getSortOrder() != null ? req.getSortOrder() : 0);
         return target;
     }
 

@@ -44,6 +44,4 @@ public class PlanRequest {
     @Pattern(regexp = "ACTIVE|INACTIVE",
             message = "狀態僅能為 ACTIVE 或 INACTIVE")
     private String status;
-
-    private Integer sortOrder;
 }

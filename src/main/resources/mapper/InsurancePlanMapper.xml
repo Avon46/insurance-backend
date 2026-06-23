@@ -28,10 +28,10 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO insurance_plans
             (name, category, description, base_premium, max_coverage,
-             min_age, max_age, status)
+             min_age, max_age, status, coverage_period)
         VALUES
             (#{name}, #{category}, #{description}, #{basePremium}, #{maxCoverage},
-             #{minAge}, #{maxAge}, #{status})
+             #{minAge}, #{maxAge}, #{status}, #{coveragePeriod})
     </insert>
 
     <update id="update">
@@ -43,7 +43,8 @@
             max_coverage = #{maxCoverage},
             min_age      = #{minAge},
             max_age      = #{maxAge},
-            status       = #{status}
+            status       = #{status},
+            coverage_period = #{coveragePeriod}
         WHERE id = #{id}
     </update>
 

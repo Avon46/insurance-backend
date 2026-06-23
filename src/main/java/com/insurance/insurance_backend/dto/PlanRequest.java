@@ -44,4 +44,8 @@ public class PlanRequest {
     @Pattern(regexp = "ACTIVE|INACTIVE",
             message = "狀態僅能為 ACTIVE 或 INACTIVE")
     private String status;
+
+    /** 保障年期（如：一年期 / 十年期 / 二十年期 / 終身），供推薦模組配對 */
+    @Size(max = 20, message = "保障年期長度不可超過 20 字")
+    private String coveragePeriod;
 }

@@ -38,6 +38,7 @@ public class RecommendServiceImpl implements RecommendService {
                 .age(req.getAge())
                 .budgetLimit(req.getBudgetLimit())
                 .categories(req.getPrimaryNeeds())
+                .schedule(req.getSchedule())
                 .build();
 
         log.info("查詢條件: {}", cond);

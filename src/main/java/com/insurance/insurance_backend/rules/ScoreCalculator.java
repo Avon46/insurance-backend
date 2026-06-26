@@ -110,9 +110,9 @@ public class ScoreCalculator {
 
         // 預算理由
         if (budgetScore >= BUDGET_SCORE_MAX * 0.8) {
-            sb.append("保費非常貼近您的預算上限；");
+            sb.append("保費非常貼近您的預算上限。");
         } else if (budgetScore > 0) {
-            sb.append("保費在可接受範圍內；");
+            sb.append("保費在可接受範圍內。");
         } else {
             sb.append("保費超出預算範圍；");
         }
